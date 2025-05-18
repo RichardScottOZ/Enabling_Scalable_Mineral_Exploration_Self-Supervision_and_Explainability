@@ -1,0 +1,52 @@
+## config.yaml
+training:
+  # Learning rate not specified in the paper; to be tuned experimentally.
+  learning_rate: null
+  # Batch size not specified in the paper; to be chosen based on hardware constraints.
+  batch_size: null
+  # Pretraining converged within 30 epochs.
+  pretraining_epochs: 30
+  # Number of epochs for supervised fine-tuning not specified in the paper.
+  supervised_epochs: null
+  # Number of Monte Carlo dropout passes for uncertainty estimation (T value) not specified; recommended range is 30-50.
+  mc_dropout_passes: null
+
+model:
+  # SSLPretrainer model details:
+  encoder:
+    architecture: "Vision Transformer"
+    # Patch size, number of transformer layers, hidden dimension etc. are not specified.
+    patch_size: null
+    num_layers: null
+    hidden_dim: null
+  decoder:
+    architecture: "Transformer"
+    num_layers: 2
+    hidden_dim: null
+  # Classifier model details:
+  classifier:
+    architecture: "Multi-Layer Perceptron"
+    activation: "Parametric ReLU"
+    dropout: "to be tuned"
+    
+data:
+  # Multi-band georeferenced raster configuration.
+  num_channels: null
+  # Patch/window size (w) for slicing the raster; not specified in the paper.
+  patch_window_size: null
+  # Percentage of patches masked during self-supervised learning (75% masked, 25% kept).
+  mask_ratio: 0.75
+  # Under-sampling: percentage of unknown samples (5-10%) to filter based on similarity to positive samples.
+  undersample_filter_ratio: null
+
+evaluation:
+  metrics:
+    - F1_score
+    - Matthews_Correlation_Coefficient
+    - AUROC
+    - AUPRC
+    - Balanced_Accuracy
+    - Accuracy
+  
+experiment:
+  data_split: "80/10/10 (train/validation/test) across 5 random seeds"
