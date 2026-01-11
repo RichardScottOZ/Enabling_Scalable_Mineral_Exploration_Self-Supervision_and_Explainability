@@ -1,43 +1,55 @@
 ## config.yaml
+# Configuration for Mineral Prospectivity Mapping with Self-Supervised Learning
+# This file contains all hyperparameters and settings for the ML pipeline
+
 training:
-  # Learning rate not specified in the paper; to be tuned experimentally.
-  learning_rate: null
-  # Batch size not specified in the paper; to be chosen based on hardware constraints.
-  batch_size: null
-  # Pretraining converged within 30 epochs.
+  # Learning rate for optimization (default: 0.001 if not set)
+  learning_rate: 0.001
+  # Batch size for training (default: 32 if not set)
+  batch_size: 32
+  # Pretraining converged within 30 epochs in the paper
   pretraining_epochs: 30
-  # Number of epochs for supervised fine-tuning not specified in the paper.
-  supervised_epochs: null
-  # Number of Monte Carlo dropout passes for uncertainty estimation (T value) not specified; recommended range is 30-50.
-  mc_dropout_passes: null
+  # Number of epochs for supervised fine-tuning (default: 10 if not set)
+  supervised_epochs: 10
+  # Number of Monte Carlo dropout passes for uncertainty estimation (recommended: 30-50)
+  mc_dropout_passes: 30
 
 model:
   # SSLPretrainer model details:
   encoder:
     architecture: "Vision Transformer"
-    # Patch size, number of transformer layers, hidden dimension etc. are not specified.
-    patch_size: null
-    num_layers: null
-    hidden_dim: null
+    # Patch size for Vision Transformer (default: 16 if not set)
+    patch_size: 16
+    # Number of transformer encoder layers (default: 6 if not set)
+    num_layers: 6
+    # Hidden dimension for transformer (default: 128 if not set)
+    hidden_dim: 128
   decoder:
     architecture: "Transformer"
+    # Number of transformer decoder layers
     num_layers: 2
-    hidden_dim: null
+    # Hidden dimension for decoder (defaults to encoder hidden_dim if not set)
+    hidden_dim: 128
   # Classifier model details:
   classifier:
     architecture: "Multi-Layer Perceptron"
     activation: "Parametric ReLU"
-    dropout: "to be tuned"
+    # Dropout rate for regularization (default: 0.1 if not set)
+    dropout: 0.1
     
 data:
-  # Multi-band georeferenced raster configuration.
-  num_channels: null
-  # Patch/window size (w) for slicing the raster; not specified in the paper.
-  patch_window_size: null
-  # Percentage of patches masked during self-supervised learning (75% masked, 25% kept).
+  # Multi-band georeferenced raster configuration
+  # Number of spectral channels in the input raster (default: 3 if not set)
+  num_channels: 3
+  # Patch/window size (w) for slicing the raster (default: 64 if not set)
+  patch_window_size: 64
+  # Percentage of patches masked during self-supervised learning (75% masked, 25% kept)
   mask_ratio: 0.75
-  # Under-sampling: percentage of unknown samples (5-10%) to filter based on similarity to positive samples.
-  undersample_filter_ratio: null
+  # Under-sampling: percentage of unknown samples (5-10%) to filter based on similarity
+  undersample_filter_ratio: 0.05
+  # File paths for data (update these to point to your data files)
+  explanatory_raster_path: "data/explanatory.tif"
+  label_raster_paths: "data/label.tif"  # Can be a single path or list of paths
 
 evaluation:
   metrics:
@@ -49,4 +61,7 @@ evaluation:
     - Accuracy
   
 experiment:
-  data_split: "80/10/10 (train/validation/test) across 5 random seeds"
+  # Data split strategy: 80% train, 10% validation, 10% test
+  data_split: "80/10/10 (train/validation/test)"
+  # Random seed for reproducibility
+  random_seed: 42

@@ -283,8 +283,8 @@ class Evaluation:
             baseline = baseline.to(self.device)
         self.model.eval()  # Ensure model is in eval mode for explanation.
         # Compute integrated gradients using the model's explain() method.
-        with torch.no_grad():
-            attributions = self.model.explain(sample, baseline, steps=steps)
+        # Note: Do NOT use torch.no_grad() here as we need gradients for IG computation
+        attributions = self.model.explain(sample, baseline, steps=steps)
         # Detach and move to CPU for further processing or visualization.
         attributions = attributions.detach().cpu()
         logger.info("Integrated Gradients calculated for the given sample.")

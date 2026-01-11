@@ -66,6 +66,7 @@ class SSLPretrainer(nn.Module):
         # Data configuration
         data_config = params.get("data", {})
         self.num_channels = default_value(data_config.get("num_channels"), 3)
+        self.mask_ratio = default_value(data_config.get("mask_ratio"), 0.75)
         
         # For patch embedding, we use a linear projection.
         # The patch dimension is: channels * (patch_size * patch_size)
@@ -162,13 +163,8 @@ class SSLPretrainer(nn.Module):
         batch_size, channels, img_h, img_w = x.size()
         device = x.device
 
-        # Extract patch tokens and mask
-        patch_tokens, mask, grid_h, grid_w = self.mask_input(x, mask_ratio=default_value(self.training and self.patch_embed.training, 0.75))
-        # Note: Passing mask_ratio from config; here we use self.training as indicator (but always use config value)
-        # Instead, using the configured mask ratio from data config is more proper:
-        mask_ratio = 0.75  # default, can be adjusted via config
-        # Overwrite mask_input call with correct mask_ratio parameter from config if available.
-        patch_tokens, mask, grid_h, grid_w = self.mask_input(x, mask_ratio=mask_ratio)
+        # Extract patch tokens and mask using configured mask_ratio
+        patch_tokens, mask, grid_h, grid_w = self.mask_input(x, mask_ratio=self.mask_ratio)
         total_patches = patch_tokens.size(1)  # total number of patches
         
         # For each batch, reconstruct the full token sequence using encoder output for visible tokens and mask token for masked.
