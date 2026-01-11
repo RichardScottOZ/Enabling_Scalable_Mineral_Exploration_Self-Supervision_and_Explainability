@@ -284,6 +284,11 @@ class Trainer:
             if pos_count < neg_count:
                 # Oversample positive samples to match number of negatives
                 pos_indices_filtered = np.where(y_filtered.cpu().numpy() == 1)[0]
+                
+                if len(pos_indices_filtered) == 0:
+                    logger.warning("No positive samples after filtering. Skipping oversampling.")
+                    return X_filtered, y_filtered
+                
                 factor = int(np.ceil(neg_count / pos_count))
                 X_pos = X_filtered[pos_indices_filtered]
                 y_pos = y_filtered[pos_indices_filtered]

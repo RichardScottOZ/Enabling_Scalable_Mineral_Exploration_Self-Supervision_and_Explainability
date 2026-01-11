@@ -76,30 +76,30 @@ def load_config(config_path: str = "config.yaml") -> dict:
     
     # Set defaults for training config
     training_config = config.get("training", {})
-    training_config["learning_rate"] = training_config.get("learning_rate") or DEFAULT_LEARNING_RATE
-    training_config["batch_size"] = training_config.get("batch_size") or DEFAULT_BATCH_SIZE
-    training_config["pretraining_epochs"] = training_config.get("pretraining_epochs") or DEFAULT_PRETRAIN_EPOCHS
-    training_config["supervised_epochs"] = training_config.get("supervised_epochs") or DEFAULT_SUPERVISED_EPOCHS
-    training_config["mc_dropout_passes"] = training_config.get("mc_dropout_passes") or DEFAULT_MC_DROPOUT_PASSES
+    training_config["learning_rate"] = training_config.get("learning_rate") if training_config.get("learning_rate") is not None else DEFAULT_LEARNING_RATE
+    training_config["batch_size"] = training_config.get("batch_size") if training_config.get("batch_size") is not None else DEFAULT_BATCH_SIZE
+    training_config["pretraining_epochs"] = training_config.get("pretraining_epochs") if training_config.get("pretraining_epochs") is not None else DEFAULT_PRETRAIN_EPOCHS
+    training_config["supervised_epochs"] = training_config.get("supervised_epochs") if training_config.get("supervised_epochs") is not None else DEFAULT_SUPERVISED_EPOCHS
+    training_config["mc_dropout_passes"] = training_config.get("mc_dropout_passes") if training_config.get("mc_dropout_passes") is not None else DEFAULT_MC_DROPOUT_PASSES
     config["training"] = training_config
 
     # Set defaults for model config, particularly for encoder, decoder and classifier
     model_config = config.get("model", {})
     encoder_config = model_config.get("encoder", {})
-    encoder_config["patch_size"] = encoder_config.get("patch_size") or 16
-    encoder_config["num_layers"] = encoder_config.get("num_layers") or 6
-    encoder_config["hidden_dim"] = encoder_config.get("hidden_dim") or 128
-    encoder_config["architecture"] = encoder_config.get("architecture") or "Vision Transformer"
+    encoder_config["patch_size"] = encoder_config.get("patch_size") if encoder_config.get("patch_size") is not None else 16
+    encoder_config["num_layers"] = encoder_config.get("num_layers") if encoder_config.get("num_layers") is not None else 6
+    encoder_config["hidden_dim"] = encoder_config.get("hidden_dim") if encoder_config.get("hidden_dim") is not None else 128
+    encoder_config["architecture"] = encoder_config.get("architecture") if encoder_config.get("architecture") is not None else "Vision Transformer"
     model_config["encoder"] = encoder_config
 
     decoder_config = model_config.get("decoder", {})
-    decoder_config["num_layers"] = decoder_config.get("num_layers") or 2
-    decoder_config["hidden_dim"] = decoder_config.get("hidden_dim") or encoder_config["hidden_dim"]
-    decoder_config["architecture"] = decoder_config.get("architecture") or "Transformer"
+    decoder_config["num_layers"] = decoder_config.get("num_layers") if decoder_config.get("num_layers") is not None else 2
+    decoder_config["hidden_dim"] = decoder_config.get("hidden_dim") if decoder_config.get("hidden_dim") is not None else encoder_config["hidden_dim"]
+    decoder_config["architecture"] = decoder_config.get("architecture") if decoder_config.get("architecture") is not None else "Transformer"
     model_config["decoder"] = decoder_config
     
     classifier_config = model_config.get("classifier", {})
-    classifier_config["activation"] = classifier_config.get("activation") or "Parametric ReLU"
+    classifier_config["activation"] = classifier_config.get("activation") if classifier_config.get("activation") is not None else "Parametric ReLU"
     # Handle dropout which might be a string "to be tuned" in original config
     dropout_val = classifier_config.get("dropout")
     if dropout_val is None or isinstance(dropout_val, str):
@@ -111,10 +111,10 @@ def load_config(config_path: str = "config.yaml") -> dict:
 
     # Set defaults for data config
     data_config = config.get("data", {})
-    data_config["num_channels"] = data_config.get("num_channels") or DEFAULT_NUM_CHANNELS
-    data_config["patch_window_size"] = data_config.get("patch_window_size") or DEFAULT_PATCH_WINDOW_SIZE
-    data_config["mask_ratio"] = data_config.get("mask_ratio") or DEFAULT_MASK_RATIO
-    data_config["undersample_filter_ratio"] = data_config.get("undersample_filter_ratio") or DEFAULT_UNDERSAMPLE_FILTER_RATIO
+    data_config["num_channels"] = data_config.get("num_channels") if data_config.get("num_channels") is not None else DEFAULT_NUM_CHANNELS
+    data_config["patch_window_size"] = data_config.get("patch_window_size") if data_config.get("patch_window_size") is not None else DEFAULT_PATCH_WINDOW_SIZE
+    data_config["mask_ratio"] = data_config.get("mask_ratio") if data_config.get("mask_ratio") is not None else DEFAULT_MASK_RATIO
+    data_config["undersample_filter_ratio"] = data_config.get("undersample_filter_ratio") if data_config.get("undersample_filter_ratio") is not None else DEFAULT_UNDERSAMPLE_FILTER_RATIO
     
     # Set default file paths if not provided
     data_config["explanatory_raster_path"] = data_config.get("explanatory_raster_path", "data/explanatory.tif")
@@ -122,7 +122,7 @@ def load_config(config_path: str = "config.yaml") -> dict:
     config["data"] = data_config
 
     # Set random seed
-    config["random_seed"] = config.get("random_seed") or DEFAULT_RANDOM_SEED
+    config["random_seed"] = config.get("random_seed") if config.get("random_seed") is not None else DEFAULT_RANDOM_SEED
 
     logger.info("Configuration loaded and defaults set.")
     return config

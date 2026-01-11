@@ -69,7 +69,7 @@ def create_synthetic_data(num_samples=200, num_channels=3, patch_size=64):
     X = (X - X.mean(axis=(2, 3), keepdims=True)) / (X.std(axis=(2, 3), keepdims=True) + 1e-8)
     
     # Generate binary labels with class imbalance (20% positive)
-    y = (np.random.rand(num_samples) < 0.2).astype(np.int64)
+    y = (np.random.rand(num_samples) < 0.2).astype(int)
     
     logger.info("Synthetic data generated. Label distribution: %d positive, %d negative",
                 y.sum(), num_samples - y.sum())
