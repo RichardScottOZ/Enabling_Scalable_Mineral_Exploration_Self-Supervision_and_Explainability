@@ -128,9 +128,15 @@ class DatasetLoader:
         Returns:
             np.ndarray: Processed raster data with the same shape as X_raw.
         """
+        if X_raw is None or X_raw.size == 0:
+            raise ValueError("Input raster X_raw is empty or None")
+        
         X_processed = X_raw.astype(np.float32)
         m, rows, cols = X_processed.shape
         logger.info("Starting preprocessing on data with shape: %s", X_processed.shape)
+        
+        if m == 0 or rows == 0 or cols == 0:
+            raise ValueError(f"Invalid raster dimensions: {X_processed.shape}")
 
         # For each channel, remove outliers and impute missing values
         for ch in range(m):
@@ -183,11 +189,31 @@ class DatasetLoader:
         Returns:
             List[np.ndarray]: List of patches, each with shape (m, w, w).
         """
+        if X is None or X.size == 0:
+            raise ValueError("Input raster X is empty or None")
+        
+        if w <= 0:
+            raise ValueError(f"Patch window size must be positive, got: {w}")
+        
         m, rows, cols = X.shape
+        
+        if rows < w or cols < w:
+            raise ValueError(
+                f"Raster dimensions ({rows}x{cols}) are smaller than patch size ({w}x{w}). "
+                f"Please use a smaller patch_window_size in config.yaml or provide a larger raster."
+            )
+        
         patches = []
         # Determine number of patches along rows and columns.
         num_patches_row = rows // w
         num_patches_col = cols // w
+        
+        if num_patches_row == 0 or num_patches_col == 0:
+            raise ValueError(
+                f"Cannot create patches with window size {w} from raster dimensions {rows}x{cols}. "
+                f"Resulting patches would be {num_patches_row}x{num_patches_col}. "
+                f"Please reduce patch_window_size in config.yaml."
+            )
 
         logger.info("Creating patches with window size %d, total patches: %d x %d", w, num_patches_row, num_patches_col)
 

@@ -284,11 +284,17 @@ class Trainer:
             if pos_count < neg_count:
                 # Oversample positive samples to match number of negatives
                 pos_indices_filtered = np.where(y_filtered.cpu().numpy() == 1)[0]
+                
+                if len(pos_indices_filtered) == 0:
+                    logger.warning("No positive samples after filtering. Skipping oversampling.")
+                    return X_filtered, y_filtered
+                
                 factor = int(np.ceil(neg_count / pos_count))
                 X_pos = X_filtered[pos_indices_filtered]
                 y_pos = y_filtered[pos_indices_filtered]
-                X_oversampled = X_pos.repeat(factor, dim=0)
-                y_oversampled = y_pos.repeat(factor, dim=0)
+                # Repeat samples along the batch dimension
+                X_oversampled = X_pos.repeat(factor, 1, 1, 1)
+                y_oversampled = y_pos.repeat(factor)
                 # Combine original negatives and oversampled positives
                 neg_indices_filtered = np.where(y_filtered.cpu().numpy() == 0)[0]
                 X_neg = X_filtered[neg_indices_filtered]
@@ -310,7 +316,8 @@ class Trainer:
         logger.info("Starting supervised fine-tuning for %d epochs.", self.supervised_epochs)
         # Convert supervised training data to tensors if not already done.
         X_train_tensor = self.X_train_supervised.to(self.device)
-        y_train_tensor = self.y_train_supervised.to(self.device).float().unsqueeze(1)  # shape: [N, 1]
+        # y_train_tensor should be long for class labels, will be converted to float in loss
+        y_train_tensor = self.y_train_supervised.to(self.device)
 
         # Apply undersampling on the training data.
         X_train_filtered, y_train_filtered = self._undersample_supervised_data(X_train_tensor, y_train_tensor)
@@ -326,6 +333,8 @@ class Trainer:
             batch_count = 0
             for batch in train_loader:
                 x_batch, y_batch = batch
+                # Ensure y_batch has correct shape for BCE loss [batch_size, 1]
+                y_batch = y_batch.float().unsqueeze(1) if y_batch.dim() == 1 else y_batch.float()
                 self.classifier_optimizer.zero_grad()
                 # Forward pass: the combined model's forward extracts features via frozen encoder and then passes through classifier.
                 predictions = self.combined_model(x_batch)
@@ -359,7 +368,9 @@ class Trainer:
         self.combined_model.eval()
         if validation:
             X_val = self.X_val_supervised.to(self.device)
-            y_val = self.y_val_supervised.to(self.device).float().unsqueeze(1)
+            y_val = self.y_val_supervised.to(self.device)
+            # Ensure y_val has correct shape
+            y_val = y_val.float().unsqueeze(1) if y_val.dim() == 1 else y_val.float()
             with torch.no_grad():
                 predictions = self.combined_model(X_val)
                 loss = self.bce_loss_fn(predictions, y_val)
