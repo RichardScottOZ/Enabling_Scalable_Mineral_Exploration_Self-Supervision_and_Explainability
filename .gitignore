@@ -35,11 +35,13 @@ venv.bak/
 *.pt
 *.ckpt
 
-# Data files
-data/
-*.tif
-*.tiff
-*.geotiff
+# Data files - ignore raster files but keep directory structure
+data/*.tif
+data/*.tiff
+data/*.geotiff
+data/**/*.tif
+data/**/*.tiff
+data/**/*.geotiff
 
 # Logs and temporary files
 *.log
