@@ -287,8 +287,9 @@ class Trainer:
                 factor = int(np.ceil(neg_count / pos_count))
                 X_pos = X_filtered[pos_indices_filtered]
                 y_pos = y_filtered[pos_indices_filtered]
-                X_oversampled = X_pos.repeat(factor, dim=0)
-                y_oversampled = y_pos.repeat(factor, dim=0)
+                # Repeat samples along the batch dimension
+                X_oversampled = X_pos.repeat(factor, 1, 1, 1)
+                y_oversampled = y_pos.repeat(factor)
                 # Combine original negatives and oversampled positives
                 neg_indices_filtered = np.where(y_filtered.cpu().numpy() == 0)[0]
                 X_neg = X_filtered[neg_indices_filtered]

@@ -349,4 +349,3 @@ if __name__ == "__main__":
     sample = dummy_X[0].unsqueeze(0)  # single sample with shape [1, 3, 64, 64]
     attribution = evaluator.explain_sample(sample)
     print("Integrated Gradients Attribution shape:", attribution.shape)
-"""
